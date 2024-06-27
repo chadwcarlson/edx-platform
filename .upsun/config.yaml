@@ -1,0 +1,119 @@
+applications:
+
+    edx:
+
+        stack:
+            - nodejs@18
+            - nodePackages.npm
+            # - python@3.11
+
+        relationships:
+            database:
+                service: dbmysql
+                endpoint: admin
+            lms-database:
+                service: dbmysql
+                endpoint: lmsrw
+            cms-database:
+                service: dbmysql
+                endpoint: cmsrw
+            mongo-database:
+                service: dbmongo
+            cache:
+                service: memcached
+
+        hooks:
+            build: |
+                echo "build hook here"
+                # # frontend
+                # npm clean-install
+
+                # # backend-build
+                # pip install -r requirements/edx/assets.txt
+
+                # # backend application
+                # pip install -r requirements/edx/base.txt
+
+                # # build static assets
+                # npm run build
+
+                # # Download locales and collect static assets 
+                # make pull_translations
+                # ./manage.py lms collectstatic
+                # ./manage.py cms collectstatic
+
+            deploy: |
+                echo "deploy hook here"
+                # run the migrations
+                # ./manage.py lms migrate
+                # ./manage.py lms migrate --database=student_module_history
+                # ./manage.py cms migrate
+
+        web:
+            commands:
+                start: |
+                    sleep infinity
+                    # ./manage.py lms runserver
+                    # # or
+                    # ./manage.py cms runserver
+
+services:
+    dbmongo:
+        type: mongodb-enterprise:7.0
+
+    memcached:
+        type: memcached:1.6
+
+    dbmysql:
+        type: oracle-mysql:8.0
+        configuration:
+            schemas:
+                - lms
+                - cms
+            endpoints:
+                admin:
+                    default_schema: lms
+                    privileges:
+                        lms: admin
+                        cms: admin
+                lmsrw:
+                    default_schema: lms
+                    privileges:
+                        lms: rw
+                cmsrw:
+                    default_schema: cms
+                    privileges:
+                        cms: rw
+
+
+
+routes:
+
+    "https://{default}/":
+        type: upstream
+        primary: true
+        upstream: "edx:http"
+    "https://www.{default}":
+        type: redirect
+        to: "https://{default}/"
+
+    # "https://{default}/bun":
+    #     type: upstream
+    #     upstream: "bun_app:http"
+    # "https://www.{default}/bun":
+    #     type: redirect
+    #     to: "https://{default}/bun"
+
+    # "https://{default}/nodejs":
+    #     type: upstream
+    #     upstream: "nodejs_app:http"
+    # "https://www.{default}/nodejs":
+    #     type: redirect
+    #     to: "https://{default}/nodejs"
+
+    # "https://{default}/deno":
+    #     type: upstream
+    #     upstream: "deno_app:http"
+    # "https://www.{default}/deno":
+    #     type: redirect
+    #     to: "https://{default}/deno"
