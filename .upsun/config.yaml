@@ -13,10 +13,10 @@ applications:
                 endpoint: admin
             lms-database:
                 service: dbmysql
-                endpoint: lmsonly
+                endpoint: lmsrw
             cms-database:
                 service: dbmysql
-                endpoint: cmsonly
+                endpoint: cmsrw
             mongo-database:
                 service: dbmongo
             cache:
@@ -76,11 +76,11 @@ services:
                     privileges:
                         lms: admin
                         cms: admin
-                lmsadmin:
+                lmsrw:
                     default_schema: lms
                     privileges:
                         lms: rw
-                cmsonly:
+                cmsrw:
                     default_schema: cms
                     privileges:
                         cms: rw
