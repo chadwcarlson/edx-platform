@@ -5,7 +5,7 @@ applications:
         stack:
             - nodejs@18
             - nodePackages.npm
-            - python@3.11
+            # - python@3.11
 
         relationships:
             database:
